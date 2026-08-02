@@ -1,0 +1,22 @@
+﻿# Local QA/render artifacts
+.codex-docx-render/
+
+# Dependencies and build outputs
+.output/
+.vinext/
+.wrangler/
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log
+
