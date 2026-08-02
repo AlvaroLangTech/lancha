@@ -9,9 +9,14 @@ import { siteConfig } from "../../lib/site";
 // puro nao faz nada fora da Home (nao existe esse id na pagina atual). Com
 // "/#experiencia" o Next navega pra Home e rola ate a secao certa, de
 // qualquer pagina.
+// SENIOR (2026-08-02, "cade o street view? tem algum botao?"): o Tour 360°
+// só existia como card lá embaixo, perto do rodapé (seção "O que vem por
+// aí") - fácil de não achar. Adicionado direto no menu do topo, visível em
+// qualquer página, sem precisar rolar a Home até o fim.
 const navItems = [
   { href: "/#experiencia", label: "Experiência" },
   { href: "/#a-bordo", label: "A Lancha" },
+  { href: "/tour-360", label: "Tour 360°" },
   { href: "/#avaliacoes", label: "Avaliações" },
 ];
 

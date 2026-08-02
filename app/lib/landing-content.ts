@@ -1,3 +1,5 @@
+import { siteConfig } from "./site";
+
 // SENIOR (2026-07-31): conteudo exclusivo da nova landing premium
 // (app/page.tsx). Fica separado de app/lib/site.ts de proposito - aquele
 // arquivo e usado pelas 8 paginas internas antigas (a-lancha, clube, etc)
@@ -161,8 +163,16 @@ export const chatAvatar = "/call_Ja9znCNySUBrdm8z7Wz2jW4V.png";
 // /tour-360 (ver TourViewer.tsx). Campo "href" opcional: quando presente, o
 // card em ComingSoonSection vira link clicável com selo "Disponível" em vez
 // de "Em breve".
+// SENIOR (2026-08-02, "coloque o link do grupo" - pedido no card "Clube de
+// Interesse" desta seção, mesmo grupo já usado no botão "Entrar no Clube"
+// do LaunchOffer.tsx): esse card também ganhou "href" e vira "Disponível",
+// pelo mesmo mecanismo do Tour 360° acima.
 export const comingSoon = [
   { title: "Tour 360°", description: "Visita virtual da lancha, direto do navegador.", href: "/tour-360" },
   { title: "Novas rotas no Lago Paranoá", description: "Roteiros para pôr do sol, ensaio fotográfico e celebrações." },
-  { title: "Clube de Interesse", description: "Lista prioritária para quem quer saber primeiro da agenda aberta." },
+  {
+    title: "Clube de Interesse",
+    description: "Lista prioritária para quem quer saber primeiro da agenda aberta.",
+    href: siteConfig.whatsappGroupHref,
+  },
 ];

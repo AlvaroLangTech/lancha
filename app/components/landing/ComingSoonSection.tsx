@@ -46,11 +46,25 @@ export function ComingSoonSection() {
             );
 
             if (item.href) {
+              // SENIOR (2026-08-02): link externo (grupo de WhatsApp) abre em
+              // nova aba pra não tirar o visitante do site; link interno
+              // (/tour-360) navega normal na mesma aba.
+              const isExternal = item.href.startsWith("http");
               return (
-                <Reveal key={item.title} delay={index * 0.1}>
+                // SENIOR (2026-08-02, "ajuste para a altura do card ficar no
+                // padrao"): o grid já estica cada Reveal pra altura da linha
+                // (comportamento padrão do CSS Grid), mas o <a> de dentro,
+                // sendo um bloco comum, só ficava do tamanho do próprio
+                // conteúdo - por isso o card "Tour 360°" (descrição de 1
+                // linha) ficava visualmente mais baixo que os outros dois
+                // (descrição de 2 linhas). h-full no Reveal + flex h-full no
+                // <a> faz o card clicável esticar igual aos não-clicáveis.
+                <Reveal key={item.title} delay={index * 0.1} className="h-full">
                   <a
                     href={item.href}
-                    className="relative block rounded-2xl border border-white/10 bg-abyss-card p-8 transition hover:border-neon/40 hover:bg-abyss-card/80"
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="relative flex h-full flex-col rounded-2xl border border-white/10 bg-abyss-card p-8 transition hover:border-neon/40 hover:bg-abyss-card/80"
                   >
                     {content}
                   </a>
