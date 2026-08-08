@@ -9,6 +9,7 @@ const routes = [
   "/perguntas-frequentes",
   "/clube",
   "/tour-360",
+  "/seja-parceira",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

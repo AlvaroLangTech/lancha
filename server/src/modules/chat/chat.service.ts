@@ -31,7 +31,7 @@ FATOS REAIS (nunca invente número diferente destes):
 - Horário: ${PRODUCT_FACTS.hours}
 - Capacidade: ${PRODUCT_FACTS.capacity}
 - O que está incluso: ${PRODUCT_FACTS.inclusions}
-- Sinal/reserva: ${PRODUCT_FACTS.deposit}
+- Pagamento/reserva: ${PRODUCT_FACTS.deposit}
 - Cancelamento: ${PRODUCT_FACTS.cancellation}
 - Local de embarque: ${PRODUCT_FACTS.embark}
 - WhatsApp da equipe: ${PRODUCT_FACTS.whatsapp}

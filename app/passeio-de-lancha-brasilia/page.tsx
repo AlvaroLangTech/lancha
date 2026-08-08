@@ -37,7 +37,7 @@ export default function Page() {
           <div className="mx-auto max-w-6xl">
             <InfoPanelGrid>
               <InfoPanel title="Como funciona" icon={Route} wide>
-                Reserve direto pelo site: seus dados, confirmação por email e sinal de 50% via Pix, cartão ou boleto —
+                Reserve direto pelo site: seus dados, confirmação por email e pagamento integral via Pix, cartão ou boleto —
                 em poucos minutos, sem precisar sair da página. Prefere conversar antes? É só chamar no WhatsApp.
               </InfoPanel>
 
@@ -52,7 +52,7 @@ export default function Page() {
                 </ul>
               </InfoPanel>
 
-              <InfoPanel title="Sinal e cancelamento" icon={Banknote} delay={0.15}>
+              <InfoPanel title="Pagamento e cancelamento" icon={Banknote} delay={0.15}>
                 <p>{bookingPolicy.deposit}</p>
                 <p className="mt-2">{bookingPolicy.cancellation}</p>
               </InfoPanel>
@@ -89,10 +89,10 @@ export default function Page() {
             <Reveal>
               <p className="font-display text-xs font-bold uppercase tracking-[0.3em] text-neon">Conversão</p>
               <h2 className="mt-4 font-display text-3xl font-extrabold uppercase leading-[0.95] text-white md:text-4xl">
-                Reserve e pague o sinal direto aqui.
+                Reserve e pague direto aqui.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-white/60">
-                4 passos rápidos: seus dados, confirmação por email, sinal de 50% via Pix, cartão ou boleto — sua data
+                4 passos rápidos: seus dados, confirmação por email, pagamento integral via Pix, cartão ou boleto — sua data
                 fica garantida assim que o pagamento cai. Prefere conversar antes? Fala com a equipe no WhatsApp.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">

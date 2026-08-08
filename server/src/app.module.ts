@@ -15,6 +15,10 @@ import { EmailVerificationModule } from './modules/email-verification/email-veri
 import { AsaasModule } from './modules/asaas/asaas.module';
 import { CheckoutModule } from './modules/checkout/checkout.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { Partner } from './modules/partners/partner.entity';
+import { PartnerVote } from './modules/partners/partner-vote.entity';
+import { PartnerPayout } from './modules/partners/partner-payout.entity';
+import { PartnersModule } from './modules/partners/partners.module';
 
 // SENIOR (2026-08-01): backend novo e dedicado pra Lancha Beju - NAO e
 // multi-tenant (um negocio so), entao sem TenantMiddleware/x-tenant-slug
@@ -30,7 +34,7 @@ import { ChatModule } from './modules/chat/chat.module';
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => {
         const dbType = cfg.get<string>('DB_TYPE') || 'better-sqlite3';
-        const entities = [AdminUser, Booking, Lead, EmailVerificationCode];
+        const entities = [AdminUser, Booking, Lead, EmailVerificationCode, Partner, PartnerVote, PartnerPayout];
 
         if (dbType === 'postgres') {
           const url = cfg.get<string>('DB_URL');
@@ -60,6 +64,7 @@ import { ChatModule } from './modules/chat/chat.module';
     AsaasModule,
     CheckoutModule,
     ChatModule,
+    PartnersModule,
   ],
   providers: [
     {

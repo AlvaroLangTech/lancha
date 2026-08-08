@@ -14,7 +14,12 @@ RUN npm run build
 
 # Stage 2: Production Runtime
 FROM node:20-alpine AS runner
-RUN apk add --no-cache curl
+# SENIOR (2026-08-03, bug real de deploy: build quebrava aqui com "Could not
+# find any Python installation" porque better-sqlite3 precisa compilar
+# codigo nativo e este estagio reinstala as deps de producao do zero, mas so
+# tinha "curl" instalado - faltava python3/make/g++ (que o estagio builder
+# ja tem la em cima, mas cada estagio do Docker e isolado).
+RUN apk add --no-cache curl python3 make g++
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/package*.json ./

@@ -102,7 +102,7 @@ function respostaFixa(action: string): string {
     case "faq_embarque":
       return `${embarkPoint.title}. ${embarkPoint.description}`;
     case "faq_pagamento":
-      return "Pix, cartão de crédito ou boleto — o sinal de 50% pode ser em qualquer um, direto por aqui no chat.";
+      return "Pix, cartão de crédito ou boleto — pagamento integral em qualquer um, direto por aqui no chat.";
     case "faq_remarcar":
       return `${bookingPolicy.cancellation} Fala com a gente pelo WhatsApp que vemos a melhor data.`;
     default:
@@ -283,7 +283,7 @@ export function SiteChatWidget() {
     try {
       await checkoutApi.verifyEmail(booking.bookingId, code);
       setBookingStep("payment_method");
-      pushBot("Email confirmado! Como prefere pagar o sinal de 50%?");
+      pushBot("Email confirmado! Como prefere pagar?");
       setMenu([
         { label: "Pix", action: "pay_PIX" },
         { label: "Cartão de crédito", action: "pay_CREDIT_CARD" },

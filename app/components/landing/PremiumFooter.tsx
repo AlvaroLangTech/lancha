@@ -37,6 +37,7 @@ export function PremiumFooter() {
             <nav className="mt-4 flex flex-col gap-2 text-sm font-bold">
               <a href="/perguntas-frequentes" className="hover:underline">Perguntas Frequentes</a>
               <a href="/seguranca-e-regras" className="hover:underline">Segurança e Regras</a>
+              <a href="/seja-parceira" className="hover:underline">Seja Parceira</a>
             </nav>
           </div>
         </div>

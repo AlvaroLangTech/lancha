@@ -73,3 +73,15 @@
   50% { transform: scale(1.07) translate(-1.5%, 1%); }
   100% { transform: scale(1) translate(0, 0); }
 }
+
+/* SENIOR (2026-08-06, pedido do Alvaro: "fotos passando na horizontal" pra
+   dar destaque às parceiras na home): faixa de fotos deslizando sozinha,
+   sem depender de nenhuma lib de carrossel - a trilha é a lista de fotos
+   DUPLICADA (ver PartnersPhotoCarousel.tsx) andando -50% (metade do
+   conteúdo real), então quando a 1ª cópia sai da tela a 2ª já está exatamente
+   no lugar da 1ª - looping contínuo sem "pulo" visível. Fora de @layer pelo
+   mesmo motivo do ken-burns acima. */
+@keyframes partners-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

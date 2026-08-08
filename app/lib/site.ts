@@ -87,7 +87,7 @@ export const faqItems = [
   {
     question: "O valor e a duracao ja estao confirmados?",
     answer:
-      "Sim. A diaria e R$ 2.500, das 10h as 20h, para ate 9 pessoas, com piloto, combustivel e churrasqueiro a bordo inclusos. A reserva e garantida com 50% de sinal via Pix ou cartao.",
+      "Sim. A diaria e R$ 2.500, das 10h as 20h, para ate 9 pessoas, com piloto, combustivel e churrasqueiro a bordo inclusos. O pagamento e integral, via Pix, cartao ou boleto, para garantir a reserva.",
   },
   {
     question: "O Clube adiciona pessoas automaticamente em grupo?",

@@ -12,11 +12,10 @@ SERVIÇO E PREÇO
 - Cliente leva: carne, petiscos e bebidas.
 
 RESERVA E PAGAMENTO
-- Reserva garantida com 50% de sinal (Pix ou cartão de crédito via link de pagamento online).
-- Restante pode ser pago até o dia do passeio.
-- Cancelamento com 7+ dias de antecedência: reembolso integral do sinal.
-- Cancelamento entre 7 e 2 dias: sinal vira crédito para outra data.
-- Cancelamento com menos de 48h: sinal não é reembolsável.
+- Reserva garantida com pagamento integral (Pix, cartão de crédito ou boleto via link de pagamento online).
+- Cancelamento com 7+ dias de antecedência: reembolso integral.
+- Cancelamento entre 7 e 2 dias: valor vira crédito para outra data.
+- Cancelamento com menos de 48h: valor não é reembolsável.
 - Em caso de mau tempo que impeça navegar com segurança: remarcação sem custo, por acordo.
 
 LOCAL DE EMBARQUE

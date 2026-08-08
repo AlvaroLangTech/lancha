@@ -16,7 +16,7 @@ export const PRODUCT_FACTS = {
   hours: 'Das 10h às 20h',
   capacity: 'Até 9 pessoas',
   inclusions: 'Piloto, combustível, churrasqueiro a bordo, 10h de passeio e até 9 pessoas já inclusos na diária',
-  deposit: 'Reserva garantida com 50% de sinal via Pix, cartão de crédito ou boleto',
+  deposit: 'Pagamento integral via Pix, cartão de crédito ou boleto para garantir a reserva',
   cancellation: 'Reembolso integral até 7 dias antes do passeio; crédito para nova data entre 7 e 2 dias antes',
   embark: 'Vila Planalto — Motonáutica, ao lado do Life Resort, Brasília-DF (estacionamento amplo, bar e restaurante no local)',
   boat: 'Lancha Bêju, passeio 100% privativo (sem dividir com outros grupos) no Lago Paranoá',

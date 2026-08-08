@@ -38,8 +38,17 @@ export class Booking {
   @Column({ nullable: true })
   holdExpiresAt?: Date;
 
-  @Column({ type: 'int', default: 125000 })
-  depositAmountCents: number; // 50% de R$ 2.500 = R$ 1.250,00 (boatPackage.price / 2), em centavos
+  // SENIOR (2026-08-03, correcao urgente do Alvaro: "nao existe esse negocio
+  // de 50%, e de uma vez so" - ate aqui o sistema cobrava so metade do valor
+  // (sinal), com o resto acertado depois com o piloto. Alvaro confirmou que
+  // isso esta ERRADO: o pagamento e sempre integral, de uma vez, no
+  // checkout. Renomeado o CONCEITO pra "valor cobrado no checkout" (mantendo
+  // o nome da coluna pra nao precisar de migração de banco), e o valor agora
+  // e o preco cheio. checkout.service.ts passa esse valor explicitamente na
+  // criacao da reserva, entao nao depende mais do default da coluna no
+  // Postgres (que so se aplicaria numa coluna omitida no INSERT).
+  @Column({ type: 'int', default: 250000 })
+  depositAmountCents: number; // valor cobrado no checkout = preco integral da diária (R$ 2.500,00), em centavos
 
   @Column({ default: 'pending_verification' })
   status: BookingStatus;
@@ -68,6 +77,19 @@ export class Booking {
 
   @Column({ nullable: true })
   termsAcceptedAt?: Date;
+
+  // SENIOR (2026-08-05, pedido do Alvaro: "sistema de indicação com cupom...
+  // objetivo delas se tornarem vendedoras e receberem comissão"): quando o
+  // cliente digita um cupom válido no checkout, guarda o ID da parceira aqui
+  // - é isso que partners.service.ts soma pro ranking/comissão quando a
+  // reserva vira "confirmed". couponCodeUsed guarda o texto cru digitado
+  // (mesmo se o cupom for inválido/de parceira desativada), só pra
+  // auditoria - nunca é a fonte de verdade da comissão, só partnerId é.
+  @Column({ nullable: true })
+  partnerId?: string;
+
+  @Column({ nullable: true })
+  couponCodeUsed?: string;
 
   @CreateDateColumn()
   createdAt: Date;

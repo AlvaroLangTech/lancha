@@ -13,7 +13,7 @@ export function ReserveButton({ className }: { className?: string }) {
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={className}>
-        Reservar e pagar sinal
+        Reservar e pagar agora
       </button>
       <CheckoutModal open={open} onClose={() => setOpen(false)} />
     </>

@@ -36,6 +36,8 @@ export interface StartCheckoutInput {
   occasion?: string;
   termsAccepted: boolean;
   termsVersion: string;
+  couponCode?: string;
+  partnerId?: string;
 }
 
 export interface StartCheckoutResult {

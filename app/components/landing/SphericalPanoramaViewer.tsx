@@ -12,13 +12,23 @@ import { useEffect, useRef } from "react";
 // pequena, madura, MIT, feita exatamente pra isso (rotação livre em
 // qualquer direção + zoom), sem precisar montar câmera/esfera/controles do
 // zero em Three.js.
+//
+// SENIOR (2026-08-03, pedido do Alvaro: "permita andar pela imagem" - agora
+// com a segunda cena panoramica pronta): trocado de UMA cena fixa pro modo
+// MULTI-CENA nativo do Pannellum (config `scenes` + `hotSpots` do tipo
+// "scene"). Cada cena pode ter um ou mais pontos clicaveis DENTRO da propria
+// imagem 360 que levam pra outra cena - isso e o que da a sensacao de
+// "andar" pela lancha (doca -> console -> doca), sem precisar da feature
+// paga "Create World" do gerador de imagem (essa e outra tecnologia, 3D de
+// verdade, cara e incompativel com o resto do site). O Pannellum troca de
+// cena com crossfade suave sozinho.
 declare global {
   interface Window {
     pannellum?: {
       viewer: (
         container: HTMLElement,
         config: Record<string, unknown>,
-      ) => { destroy: () => void };
+      ) => { destroy: () => void; loadScene: (sceneId: string) => void };
     };
   }
 }
@@ -47,41 +57,69 @@ function loadPannellum(): Promise<void> {
   return pannellumLoad;
 }
 
-interface SphericalPanoramaViewerProps {
-  src: string;
-  alt: string;
+export interface SphericalHotspot {
+  pitch: number;
+  yaw: number;
+  targetSceneId: string;
+  text: string;
 }
 
-export function SphericalPanoramaViewer({ src, alt }: SphericalPanoramaViewerProps) {
+export interface SphericalScene {
+  id: string;
+  src: string;
+  alt: string;
+  hotspots?: SphericalHotspot[];
+}
+
+interface SphericalPanoramaViewerProps {
+  scenes: SphericalScene[];
+  initialSceneId: string;
+}
+
+export function SphericalPanoramaViewer({ scenes, initialSceneId }: SphericalPanoramaViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const viewerRef = useRef<{ destroy: () => void } | null>(null);
+  const viewerRef = useRef<{ destroy: () => void; loadScene: (sceneId: string) => void } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
+    const sceneConfig: Record<string, unknown> = {};
+    for (const scene of scenes) {
+      sceneConfig[scene.id] = {
+        type: "equirectangular",
+        panorama: scene.src,
+        title: scene.alt,
+        hotSpots: (scene.hotspots || []).map((hs) => ({
+          pitch: hs.pitch,
+          yaw: hs.yaw,
+          type: "scene",
+          sceneId: hs.targetSceneId,
+          text: hs.text,
+        })),
+      };
+    }
 
     loadPannellum()
       .then(() => {
         if (cancelled || !containerRef.current || !window.pannellum) return;
         viewerRef.current = window.pannellum.viewer(containerRef.current, {
-          type: "equirectangular",
-          panorama: src,
-          title: alt,
-          autoLoad: true,
-          compass: false,
-          showZoomCtrl: true,
-          showFullscreenCtrl: true,
-          mouseZoom: true,
-          draggable: true,
-          // SENIOR (2026-08-02, "eu já quero o zoom longe no maximo, zoom
-          // out, nao proximo"): hfov = campo de visão horizontal - quanto
-          // MAIOR, mais "afastado"/mais cena cabe na tela. Antes abria em
-          // 100 (mais perto); agora abre já no maxHfov (o zoom out máximo
-          // permitido), pra mostrar a cena inteira de cara. O visitante
-          // ainda pode dar zoom in se quiser (scroll/botão -), só não começa
-          // assim.
-          hfov: 120,
-          minHfov: 50,
-          maxHfov: 120,
+          default: {
+            firstScene: initialSceneId,
+            autoLoad: true,
+            compass: false,
+            showZoomCtrl: true,
+            showFullscreenCtrl: true,
+            mouseZoom: true,
+            draggable: true,
+            sceneFadeDuration: 800,
+            // SENIOR (2026-08-02, "eu já quero o zoom longe no maximo, zoom
+            // out, nao proximo"): hfov = campo de visão horizontal - quanto
+            // MAIOR, mais "afastado"/mais cena cabe na tela.
+            hfov: 120,
+            minHfov: 50,
+            maxHfov: 120,
+          },
+          scenes: sceneConfig,
         });
       })
       .catch(() => {
@@ -94,12 +132,13 @@ export function SphericalPanoramaViewer({ src, alt }: SphericalPanoramaViewerPro
       viewerRef.current?.destroy();
       viewerRef.current = null;
     };
-  }, [src, alt]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenes.map((s) => s.id + s.src).join("|"), initialSceneId]);
 
   return (
     <div
       role="img"
-      aria-label={alt}
+      aria-label="Tour 360 pela Lancha Bêju"
       className="relative h-[56vh] max-h-[560px] w-full overflow-hidden rounded-2xl border border-white/10 bg-abyss-card"
     >
       {/* SENIOR (bug real, descoberto testando): Pannellum SOBRESCREVE o
@@ -110,15 +149,9 @@ export function SphericalPanoramaViewer({ src, alt }: SphericalPanoramaViewerPro
           vai pro Pannellum é medido via style inline (position/inset), que
           sobrevive à troca de className porque não é className. */}
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
-      {/* SENIOR: sem badge própria de canto aqui - o Pannellum já desenha
-          controles de zoom/fullscreen no canto superior esquerdo e o título
-          (prop "title" passada no viewer()) no inferior esquerdo; e o "X/5"
-          de progresso já vem do TourViewer no canto superior direito. Um
-          selo extra nosso ia disputar espaço com um desses em qualquer
-          canto. Só a dica central embaixo, que fica numa faixa livre. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[5] flex justify-center">
         <span className="rounded-full bg-abyss/70 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white/80 backdrop-blur">
-          Arraste em qualquer direção
+          Arraste para olhar ao redor · clique nas setas para andar pela lancha
         </span>
       </div>
     </div>

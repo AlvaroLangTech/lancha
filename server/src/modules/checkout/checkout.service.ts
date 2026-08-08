@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingsService } from '../bookings/bookings.service';
 import { EmailVerificationService } from '../email-verification/email-verification.service';
 import { AsaasService } from '../asaas/asaas.service';
+import { PartnersService } from '../partners/partners.service';
 import { StartCheckoutDto } from './dto/start-checkout.dto';
 import { PayDto } from './dto/pay.dto';
 
@@ -9,16 +10,24 @@ import { PayDto } from './dto/pay.dto';
 // funcional, checkout para o banco asaas"): orquestra as 3 etapas em ordem -
 // 1) cria a reserva (pending_verification) e dispara o código por email;
 // 2) confirma o código -> libera pagamento (awaiting_payment);
-// 3) gera a cobrança Asaas do SINAL (50%, nunca o valor cheio) - a reserva
-// só vira "confirmed" quando o webhook do Asaas confirmar o pagamento
-// (ver asaas.controller.ts), nunca antes disso. Mesma regra de ouro do
-// Viver Bem: o site não fecha venda sozinho, quem confirma é o gateway.
+// 3) gera a cobrança Asaas do valor INTEGRAL (nunca sinal parcial) - a
+// reserva só vira "confirmed" quando o webhook do Asaas confirmar o
+// pagamento (ver asaas.controller.ts), nunca antes disso. Mesma regra de
+// ouro do Viver Bem: o site não fecha venda sozinho, quem confirma é o
+// gateway.
+// SENIOR (2026-08-03, correção urgente do Alvaro: "não existe esse negócio
+// de 50%, é de uma vez só"): antes cobrava só metade (ver histórico de
+// booking.entity.ts). TOTAL_PRICE_CENTS é a única fonte da verdade do valor
+// cobrado agora - se o preço da diária mudar, muda só aqui.
+const TOTAL_PRICE_CENTS = 250000; // R$ 2.500,00
+
 @Injectable()
 export class CheckoutService {
   constructor(
     private readonly bookingsService: BookingsService,
     private readonly emailVerification: EmailVerificationService,
     private readonly asaas: AsaasService,
+    private readonly partnersService: PartnersService,
   ) {}
 
   async start(dto: StartCheckoutDto) {
@@ -29,6 +38,23 @@ export class CheckoutService {
 
     const holdExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
+    // SENIOR (2026-08-05, pedido do Alvaro: "sistema de indicação com
+    // cupom... comissão só quando vira reserva paga"): resolve o cupom AQUI,
+    // no início do checkout - não no pagamento - pra já guardar de qual
+    // parceira essa reserva veio, mesmo que o cliente demore pra pagar.
+    // Cupom errado/de parceira inativa nunca bloqueia a reserva (ver
+    // findByCouponCode - só retorna parceira ATIVA), só não atribui venda a
+    // ninguém.
+    // SENIOR (2026-08-06, pedido do Alvaro: "a pessoa escolheu a modelo...
+    // a comissão rola daí"): partnerId (escolhido no seletor do checkout)
+    // tem prioridade sobre couponCode (digitado) - é o caminho principal
+    // agora, sem fricção de decorar cupom.
+    const partner = dto.partnerId
+      ? await this.partnersService.findActiveById(dto.partnerId)
+      : dto.couponCode
+        ? await this.partnersService.findByCouponCode(dto.couponCode)
+        : null;
+
     const booking = await this.bookingsService.create({
       customerName: dto.customerName,
       customerEmail: dto.customerEmail.toLowerCase().trim(),
@@ -38,11 +64,16 @@ export class CheckoutService {
       occasion: dto.occasion,
       status: 'pending_verification',
       holdExpiresAt,
+      // SENIOR (2026-08-03): explicito aqui, não confia no default da coluna
+      // no Postgres (que só valeria se essa coluna fosse omitida no INSERT).
+      depositAmountCents: TOTAL_PRICE_CENTS,
       // SENIOR (2026-08-02): DTO já garante termsAccepted === true (ver
       // @Equals no StartCheckoutDto) - aqui só registra a EVIDÊNCIA
       // (versão + quando), pro painel gestor conseguir mostrar quem aceitou.
       termsAcceptedVersion: dto.termsVersion,
       termsAcceptedAt: new Date(),
+      partnerId: partner?.id,
+      couponCodeUsed: dto.couponCode,
     });
 
     const { sent, devCode } = await this.emailVerification.sendCode(booking.customerEmail, booking.id);
@@ -91,7 +122,7 @@ export class CheckoutService {
       customerId: asaasCustomerId,
       billingType: dto.billingType,
       value: booking.depositAmountCents / 100,
-      description: `Sinal (50%) - Passeio Lancha Bêju em ${booking.requestedDate}`,
+      description: `Passeio Lancha Bêju em ${booking.requestedDate} - pagamento integral`,
       externalReference: booking.id,
     });
 

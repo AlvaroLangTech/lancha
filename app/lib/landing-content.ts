@@ -77,7 +77,7 @@ export const boatPackage = {
 };
 
 export const bookingPolicy = {
-  deposit: "Reserva garantida com 50% de sinal via Pix ou cartão.",
+  deposit: "Pagamento integral via Pix, cartão ou boleto para garantir a reserva.",
   cancellation: "Reembolso integral até 7 dias; crédito entre 7 e 2 dias.",
   included: "Piloto, combustível, churrasqueiro, 10h de passeio e até 9 pessoas.",
 };

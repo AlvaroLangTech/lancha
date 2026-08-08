@@ -26,11 +26,23 @@ export class AuthService {
     };
   }
 
-  // SENIOR: usado só pra criar o primeiro admin (via seed/script), não é
-  // exposto como endpoint público - senão qualquer um vira admin.
+  // SENIOR (2026-08-06, bug real do Alvaro: rodou seed-admin.ts de novo pra
+  // trocar a senha e caiu em "UNIQUE constraint failed: admin_users.email"
+  // porque o email já existia de uma rodada anterior): agora é upsert - se
+  // o email já existe, ATUALIZA a senha/nome em vez de quebrar. Script fica
+  // seguro de rodar de novo a qualquer momento (mesmo padrão do
+  // seed-partners.ts, que já pulava cupom duplicado sem crashar).
   async createAdmin(email: string, password: string, displayName?: string) {
+    const normalizedEmail = email.toLowerCase().trim();
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = this.adminUsers.create({ email: email.toLowerCase().trim(), passwordHash, displayName });
+    const existing = await this.adminUsers.findOne({ where: { email: normalizedEmail } });
+
+    if (existing) {
+      await this.adminUsers.update(existing.id, { passwordHash, displayName });
+      return { ...existing, passwordHash, displayName };
+    }
+
+    const user = this.adminUsers.create({ email: normalizedEmail, passwordHash, displayName });
     return this.adminUsers.save(user);
   }
 }
