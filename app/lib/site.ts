@@ -87,7 +87,7 @@ export const faqItems = [
   {
     question: "O valor e a duracao ja estao confirmados?",
     answer:
-      "Sim. A diaria e R$ 2.500, das 10h as 20h, para ate 9 pessoas, com piloto, combustivel e churrasqueiro a bordo inclusos. O pagamento e integral, via Pix, cartao ou boleto, para garantir a reserva.",
+      "Sim. No Especial Dia dos Pais, a diaria e R$ 2.000, das 10h as 20h, para ate 9 pessoas, com piloto, combustivel e churrasqueiro a bordo inclusos. O pagamento e integral, via Pix, cartao ou boleto, para garantir a reserva.",
   },
   {
     question: "O Clube adiciona pessoas automaticamente em grupo?",
@@ -136,7 +136,7 @@ export const jsonLd = {
   },
   offers: {
     "@type": "Offer",
-    price: "2500.00",
+    price: "2000.00",
     priceCurrency: "BRL",
     availability: "https://schema.org/InStock",
     category: "Passeio de lancha",

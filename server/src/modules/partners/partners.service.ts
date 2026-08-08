@@ -21,6 +21,7 @@ import {
 // se o Alvaro quiser outra proporÃ§Ã£o.
 const SALES_WEIGHT = 0.7;
 const VOTE_WEIGHT = 0.3;
+const FATHERS_DAY_PUBLIC_PARTNERS = new Set(['nalanda', 'bessa', 'kanandra']);
 
 export interface RankingEntry {
   partnerId: string;
@@ -73,12 +74,13 @@ export class PartnersService {
     return this.partners.find({ order: { createdAt: 'DESC' } });
   }
 
-  findAllPublic() {
-    return this.partners.find({
+  async findAllPublic() {
+    const partners = await this.partners.find({
       where: { active: true },
       order: { createdAt: 'ASC' },
       select: ['id', 'name', 'instagram', 'photoUrl', 'couponCode'],
     });
+    return partners.filter((partner) => FATHERS_DAY_PUBLIC_PARTNERS.has(partner.name.trim().toLowerCase()));
   }
 
   // SENIOR (2026-08-06): usado pelo checkout quando o cliente ESCOLHE a

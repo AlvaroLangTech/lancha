@@ -43,6 +43,7 @@ const fieldErrorClass = "mt-1 text-xs font-bold text-red-300";
 const labelClass = "flex flex-col gap-1.5 text-sm";
 const buttonClass =
   "mt-2 flex min-h-13 items-center justify-center gap-2 rounded-full bg-neon text-sm font-extrabold uppercase tracking-widest text-abyss transition hover:scale-[1.02] hover:brightness-110 disabled:opacity-50 disabled:hover:scale-100";
+const FATHERS_DAY_PARTNERS = new Set(["nalanda", "bessa", "kanandra"]);
 
 export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState<Step>("form");
@@ -63,22 +64,25 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
   const [form, setForm] = useState({ customerName: "", customerEmail: "", customerPhone: "", requestedDate: "", passengerCount: 1, occasion: "" });
   // SENIOR (2026-08-06, pedido do Alvaro: "a pessoa chegou, escolheu a
   // modelo... a comissÃ£o rola daÃ­"): caminho PRINCIPAL agora Ã© escolher o
-  // nome da parceira num seletor (sem precisar saber cupom de cor) - ver
-  // partnersApi.list() (endpoint pÃºblico, sÃ³ nome/instagram/foto, nunca
-  // cupom). couponCode digitado continua existindo como alternativa pra
-  // quem sÃ³ ouviu o cÃ³digo de boca, sem link nenhum.
+  // nome da parceira num seletor (sem precisar saber cupom de cor) - para a
+  // campanha de Dia dos Pais, o checkout publico mostra só Nalanda, Bessa e
+  // Kanandra, sem fotos e sem campo manual de cupom.
   const [partners, setPartners] = useState<PublicPartner[]>([]);
   const [selectedPartnerId, setSelectedPartnerId] = useState("");
-  const [couponCode, setCouponCode] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return new URLSearchParams(window.location.search).get("cupom")?.trim() ?? "";
-  });
-
   useEffect(() => {
     if (!open) return;
     partnersApi
       .list()
-      .then(setPartners)
+      .then((items) => {
+        const campaignPartners = items.filter((partner) => FATHERS_DAY_PARTNERS.has(partner.name.trim().toLowerCase()));
+        const urlCoupon = new URLSearchParams(window.location.search).get("cupom")?.trim().toUpperCase();
+        const urlPartner = campaignPartners.find((partner) => partner.couponCode?.toUpperCase() === urlCoupon);
+
+        setPartners(campaignPartners);
+        if (urlPartner) {
+          setSelectedPartnerId(urlPartner.id);
+        }
+      })
       .catch(() => setPartners([]));
   }, [open]);
 
@@ -151,11 +155,10 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
         ...form,
         termsAccepted,
         termsVersion: TERMS_VERSION,
-        // SENIOR: partnerId (seletor) manda mais que couponCode (digitado) -
-        // sÃ³ manda um dos dois pro backend, coerente com a prioridade em
-        // CheckoutService.start.
+        // SENIOR: campanha com seleção fechada - o checkout público atribui
+        // indicação apenas pelo partnerId escolhido nos cards.
         partnerId: selectedPartnerId || undefined,
-        couponCode: selectedPartnerId ? undefined : couponCode.trim() || undefined,
+        couponCode: undefined,
       });
       setBookingId(result.bookingId);
       setDevCode(result.devCode || null);
@@ -314,7 +317,7 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
                 <div className="flex flex-col gap-2.5">
                   <div>
                     <span className="font-bold text-white/70">Quem te indicou? (opcional)</span>
-                    <p className="mt-1 text-xs text-white/45">Escolha pela foto. O cupom da parceira fica vinculado automaticamente.</p>
+                    <p className="mt-1 text-xs text-white/45">Especial Dia dos Pais: escolha a indicação e o cupom fica vinculado automaticamente.</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -336,7 +339,6 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
                         type="button"
                         onClick={() => {
                           setSelectedPartnerId(partner.id);
-                          setCouponCode(partner.couponCode ?? "");
                         }}
                         className={`min-h-28 rounded-2xl border p-2 text-left transition ${
                           selectedPartnerId === partner.id
@@ -345,14 +347,8 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
                         }`}
                       >
                         <div className="flex gap-2.5">
-                          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-white/10">
-                            {partner.photoUrl ? (
-                              <img src={partner.photoUrl} alt={partner.name} className="h-full w-full object-cover" />
-                            ) : (
-                              <span className="flex h-full w-full items-center justify-center text-lg font-black text-white/50">
-                                {partner.name.slice(0, 1)}
-                              </span>
-                            )}
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-lg font-black text-white/70">
+                            {partner.name.slice(0, 1)}
                           </div>
                           <div className="min-w-0 flex-1">
                             <span className="block truncate text-sm font-extrabold">{partner.name}</span>
@@ -373,17 +369,6 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
                     </p>
                   )}
                 </div>
-              )}
-              {!selectedPartnerId && (
-                <label className={labelClass}>
-                  <span className="font-bold text-white/70">Ou digite o cupom, se souber (opcional)</span>
-                  <input
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className={inputClass}
-                    placeholder="Ex: BESSA10"
-                  />
-                </label>
               )}
               <label className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/70">
                 <input
@@ -440,7 +425,7 @@ export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () =>
           {step === "pay" && (
             <form onSubmit={submitPay} noValidate className="flex flex-col gap-4">
               <p className="text-sm text-white/60">
-                Pagamento integral para garantir sua data: <strong className="text-white">R$ {boatPackage.price.toFixed(2)}</strong>.{" "}
+                Pagamento integral para garantir sua data: <strong className="text-white">{boatPackage.priceLabel}</strong>.{" "}
                 {bookingPolicy.cancellation}
               </p>
               <label className={labelClass}>

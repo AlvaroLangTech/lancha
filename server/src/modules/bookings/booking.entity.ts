@@ -47,8 +47,8 @@ export class Booking {
   // e o preco cheio. checkout.service.ts passa esse valor explicitamente na
   // criacao da reserva, entao nao depende mais do default da coluna no
   // Postgres (que so se aplicaria numa coluna omitida no INSERT).
-  @Column({ type: 'int', default: 250000 })
-  depositAmountCents: number; // valor cobrado no checkout = preco integral da diária (R$ 2.500,00), em centavos
+  @Column({ type: 'int', default: 200000 })
+  depositAmountCents: number; // valor cobrado no checkout = preco integral promocional (R$ 2.000,00), em centavos
 
   @Column({ default: 'pending_verification' })
   status: BookingStatus;

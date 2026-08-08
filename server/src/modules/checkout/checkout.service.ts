@@ -19,7 +19,7 @@ import { PayDto } from './dto/pay.dto';
 // de 50%, é de uma vez só"): antes cobrava só metade (ver histórico de
 // booking.entity.ts). TOTAL_PRICE_CENTS é a única fonte da verdade do valor
 // cobrado agora - se o preço da diária mudar, muda só aqui.
-const TOTAL_PRICE_CENTS = 250000; // R$ 2.500,00
+const TOTAL_PRICE_CENTS = 200000; // R$ 2.000,00 - Especial Dia dos Pais
 
 @Injectable()
 export class CheckoutService {

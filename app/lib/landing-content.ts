@@ -62,8 +62,8 @@ export const boardChecklist = [
 // origem: lanchabeju.lovable.app. Antes o site inteiro dizia "a confirmar"
 // de proposito; agora e fato publicavel.
 export const boatPackage = {
-  price: 2500,
-  priceLabel: "R$ 2.500",
+  price: 2000,
+  priceLabel: "R$ 2.000",
   priceUnit: "a diária",
   hoursLabel: "Das 10h às 20h",
   capacityLabel: "Até 9 pessoas",
@@ -77,7 +77,7 @@ export const boatPackage = {
 };
 
 export const bookingPolicy = {
-  deposit: "Pagamento integral via Pix, cartão ou boleto para garantir a reserva.",
+  deposit: "Especial Dia dos Pais: pagamento integral de R$ 2.000 via Pix, cartão ou boleto para garantir a reserva.",
   cancellation: "Reembolso integral até 7 dias; crédito entre 7 e 2 dias.",
   included: "Piloto, combustível, churrasqueiro, 10h de passeio e até 9 pessoas.",
 };
